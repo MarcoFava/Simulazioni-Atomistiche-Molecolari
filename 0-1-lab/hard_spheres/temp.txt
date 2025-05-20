@@ -1,0 +1,52 @@
+mc_nvt_hs
+Compiler: GCC version 11.4.0
+Options:  -mtune=generic -march=x86-64 -O3 -ffast-math -fpre-include=/usr/include/finclude/math-vector-fortran.h
+
+Monte Carlo, constant-NVT
+Hard sphere potential
+Diameter, sigma = 1
+Energy, kT = 1
+Number of blocks                                    10
+Number of steps per block                         1000
+Maximum displacement                          0.150000
+Pressure scaling parameter                    0.005000
+Number of particles                                108
+Simulation box length                         4.762203
+Density                                       1.000000
+Initial values
+P                                             1.000000
+
+
+Run begins
+Date:                                       2025/03/24
+Time:                                         11:48:58
+CPU time:                                     0.003206
+
+===============================================
+          Block            Move               P
+                          ratio                
+-----------------------------------------------
+              1        0.129176       10.199378
+              2        0.127213       10.085192
+              3        0.132093        9.885186
+              4        0.134417        9.888887
+              5        0.130417       10.048757
+              6        0.131824        9.959878
+              7        0.129083       10.258642
+              8        0.130657        9.809875
+              9        0.129806        9.851233
+             10        0.123833        9.988889
+-----------------------------------------------
+   Run averages        0.129852        9.997592
+     Run errors        0.000866        0.044913
+===============================================
+
+Run ends
+Date:                                       2025/03/24
+Time:                                         11:48:59
+CPU time:                                     0.872679
+
+
+Final values
+P                                            10.876543
+Program ends
