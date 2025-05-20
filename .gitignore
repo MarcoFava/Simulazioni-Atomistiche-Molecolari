@@ -1,4 +1,5 @@
-#
+.gitignore
+
 0-1-lab/
 env/
 hard_spheres/
