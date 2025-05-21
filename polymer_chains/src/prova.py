@@ -13,6 +13,9 @@ snapshots = 100
 burnin = 3*N
 steps = snapshots*burnin
 
+dr = 15
+
+
 
 # job(N=N,L=L,steps=steps,burnin=burnin)
 data = simulation(N=N,L=L,steps=steps,burnin=burnin)
@@ -38,11 +41,11 @@ for i in range(len(data['trajectory'])):
         cm = my_sys.centre_of_mass
 
         my_sys.positions = copy.deepcopy(data['trajectory'][j])
-        my_sys.centre_of_mass = cm
+        my_sys.centre_of_mass = cm + dr
 
         if overlap(data['trajectory'][i],my_sys.positions) is None: 
             no_overlaps += 1
-            print(f'rate overlaps = {no_overlaps/tot_overlap}, {i}, {j}')
+            print(f'rate overlaps = {no_overlaps/tot_overlap:.3}, {i}, {j}')
             # print(overlap(data['trajectory'][i],my_sys.positions))
             # break
 print(no_overlaps/tot_overlap)
