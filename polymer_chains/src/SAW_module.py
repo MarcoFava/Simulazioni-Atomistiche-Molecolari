@@ -80,8 +80,10 @@ def unfold(positions, L):
 #     return positions, lattice, R_values
 
 def simulation(N,L,steps,burnin):
-    import src.system as sys
-    import src.Montecarlo as mc
+#    import src.system as sys
+#    import src.Montecarlo as mc
+    import system as sys
+    import Montecarlo as mc
     import copy
 
     my_sys = sys.System(N=N,L=L)
@@ -93,12 +95,54 @@ def simulation(N,L,steps,burnin):
 
         # if step >= burnin:
         if (step>0) & (step%burnin == 0):
+            my_sys.centre_of_mass = [0,0]
             trajectory.append(copy.deepcopy(my_sys.positions))
             # R_values.append(R(my_sys.positions))
     
     return {'trajectory': trajectory
             # , 'R_values': R_values
             }
+
+def prob_overlap(dr,data,clear_first=False):
+    import system as sys
+    import Montecarlo as mc
+    import copy
+    import pantarei as rei
+    
+    task = rei.Task(overlap,clear_first=clear_first)
+
+    N = len(data['trajectory'][0])
+    L = 1000
+    my_sys = sys.System(N=N,L=L)
+    montecarlo = mc.Montecarlo(system=my_sys)
+
+    
+    no_overlaps = 0
+    tot_overlap = 0
+    for i in range(len(data['trajectory'])):
+        #if i%1 == 0: print(i)
+        for j in range(len(data['trajectory'])):
+#            for deg in [90, 180, 270]:
+            if i<=j : pass
+            
+            tot_overlap += 1
+
+            my_sys.positions = data['trajectory'][i]
+            cm = my_sys.centre_of_mass
+            
+            my_sys.positions = copy.deepcopy(data['trajectory'][j])
+            my_sys.centre_of_mass = cm + dr
+            
+#            if overlap(data['trajectory'][i],my_sys.positions) is None:
+            if task(positions_0=data['trajectory'][i],positions_1=my_sys.positions) is None:
+                no_overlaps += 1
+                # print(f'rate overlaps = {no_overlaps/tot_overlap:.3}, {i}, {j}')
+                # print(overlap(data['trajectory'][i],my_sys.positions))
+                # break
+    print(no_overlaps/tot_overlap)
+    return (tot_overlap - no_overlaps)/tot_overlap
+
+
 
 
 def overlap(positions_0, positions_1):

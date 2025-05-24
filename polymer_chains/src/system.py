@@ -62,3 +62,22 @@ class System:
                     for j in range(i, len(_positions)):
                         _positions[j][alpha] += self.L
         return _positions
+
+    def rotate_pos(self,deg=90):
+        if deg==90 or deg==-270:
+            for pos in self.positions:
+                temp_pos = pos[0]
+                pos[0] = pos[1]
+                pos[1] = -temp_pos
+        elif deg==180 or deg==-180:
+            for pos in self.positions:
+                pos[0] = -pos[0]
+                pos[1] = -pos[1]
+        elif deg==270 or deg==-90:
+            for pos in self.positions:
+                temp_pos = pos[0]
+                pos[0] = -pos[1]
+                pos[1] = temp_pos
+        else:
+            print('Warning: invalid rotation')
+        return self.positions
