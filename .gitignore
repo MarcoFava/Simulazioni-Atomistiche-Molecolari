@@ -16,9 +16,20 @@ mc-lj/*.png
 mc-lj/*.txt
 mc-lj/awa/
 
+mc-GC/save_past/
 
-polymer_chains/.pantarei/
+project_colloids_polymers/hard_spheres_fortran/
+project_colloids_polymers/trajectories/
+
+*/.pantarei/*
+*/.f2py-jit/*
+*/.vscode/*
 
 *pycache*
 *.mod
 *.png
+*.txt
+*.zip
+
+*prova*
+
