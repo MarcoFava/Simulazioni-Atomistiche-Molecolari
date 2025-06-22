@@ -80,10 +80,10 @@ def unfold(positions, L):
 #     return positions, lattice, R_values
 
 def simulation(N,L,steps,burnin):
-#    import src.system as sys
-#    import src.Montecarlo as mc
-    import system as sys
-    import Montecarlo as mc
+    import src.system as sys
+    import src.Montecarlo as mc
+    # import system as sys
+    # import Montecarlo as mc
     import copy
 
     my_sys = sys.System(N=N,L=L)
@@ -104,12 +104,14 @@ def simulation(N,L,steps,burnin):
             }
 
 def prob_overlap(dr,data,clear_first=False):
-    import system as sys
-    import Montecarlo as mc
+    import src.system as sys
+    import src.Montecarlo as mc
+    # import system as sys
+    # import Montecarlo as mc
     import copy
-    import pantarei as rei
+    # import pantarei as rei
     
-    task = rei.Task(overlap,clear_first=clear_first)
+    # task = rei.Task(overlap,clear_first=clear_first)
 
     N = len(data['trajectory'][0])
     L = 1000
@@ -133,8 +135,8 @@ def prob_overlap(dr,data,clear_first=False):
             my_sys.positions = copy.deepcopy(data['trajectory'][j])
             my_sys.centre_of_mass = cm + dr
             
-#            if overlap(data['trajectory'][i],my_sys.positions) is None:
-            if task(positions_0=data['trajectory'][i],positions_1=my_sys.positions) is None:
+            if overlap(data['trajectory'][i],my_sys.positions) is None:
+            # if task(positions_0=data['trajectory'][i],positions_1=my_sys.positions) is None:
                 no_overlaps += 1
                 # print(f'rate overlaps = {no_overlaps/tot_overlap:.3}, {i}, {j}')
                 # print(overlap(data['trajectory'][i],my_sys.positions))

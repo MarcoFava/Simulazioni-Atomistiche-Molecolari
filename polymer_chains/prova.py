@@ -1,20 +1,21 @@
 import matplotlib.pyplot as plt
-import Montecarlo as mc
-import system as sys
+import src.Montecarlo as mc
+import src.system as sys
 import numpy as np
 import random
 import copy
 import pantarei as rei
-from SAW_module import setup, mc_move, simulation, plot_val_over_NMC, unfold, visualize_chain, overlap, prob_overlap
+from src.SAW_module import setup, mc_move, simulation, plot_val_over_NMC, unfold, visualize_chain, overlap, prob_overlap
 
-#scheduler = rei.Scheduler.ThreadScheduler(backend='process')
+scheduler = rei.scheduler.ThreadScheduler(backend='process')
+# scheduler = rei.Scheduler(backend='process')
 task = rei.Task(simulation) #,clear_first=True)
 #job = rei.Thread(task, scheduler=scheduler)
 
 N = 100
 L = 1000
 snapshots = 50
-snapshots = 10
+# snapshots = 10
 # steps = 12*N
 burnin = 3*N
 steps = snapshots*burnin
@@ -22,11 +23,13 @@ steps = snapshots*burnin
 
 
 data = task(N=N,L=L,steps=steps,burnin=burnin)
-#scheduler.wait()
+scheduler.wait()
 #data = simulation(N=N,L=L,steps=steps,burnin=burnin)
 # visualize_chain(data['trajectory'][2])
 
+my_sys = sys.System(N=N,L=L)
 len_traj = len(data['trajectory'])
+print(f"Total number of configurations is: {len(data['trajectory'])}")
 for i in range(len_traj):
     my_sys.positions = copy.deepcopy(data['trajectory'][i])
     #        for deg in [90, 180, 270]:
@@ -35,15 +38,23 @@ for i in range(len_traj):
 print(f"Total number of configurations is: {len(data['trajectory'])}")
 
 
-bins = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
-bins = [0, 4, 8, 12, 16, 20]
+bins = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32]
+bins = [_ for _ in range(30)]
+# bins = [0, 4, 8, 12, 16, 20]
 drs = [bins[i]+0.5 for i in range(len(bins)-1)]
 counts = []
-for dr in drs:
-    counts.append(prob_overlap(dr=dr,data=data))
+# # task = rei.Task(prob_overlap)
+# job = rei.Thread(rei.Task(prob_overlap), scheduler=scheduler)
+# for dr in drs:
+#     result = job(dr=dr,data=data)
+#     # result = prob_overlap(dr=dr,data=data)
+#     counts.append(result)
 
-plt.stairs(counts,bins,fill=True)
-plt.savefig('prob_hist.png')
+rei.report()
+# scheduler.wait()
+
+# plt.stairs(counts,bins,fill=True)
+# plt.savefig('prob_hist.png')
 
 
 #my_sys = sys.System(N=N,L=L)
