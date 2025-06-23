@@ -172,7 +172,7 @@ def simulation(steps, burnin=0,**kwars):
 #     return counts/counts.sum()
 
 
-def plot_val_over_NMC(val,title=None, label=None,figname=None, x_multipl=1, ylabel=None,blocks=None):
+def plot_val_over_NMC(val,title=None, label=None,figname=None, x_multipl=1, ylabel=None,blocks=None,box=None):
     x = np.linspace(0,len(val)*x_multipl,len(val))
 
     plt.figure()
@@ -185,9 +185,11 @@ def plot_val_over_NMC(val,title=None, label=None,figname=None, x_multipl=1, ylab
         plt.legend()
     
     if blocks is not None:
-        y_min = min(val)
-        y_max = max(val)
-        print(y_min,y_max)
+        if box is None: box=100
+        # y_min = min(val)
+        # y_max = max(val)
+        y_min = -box/2
+        y_max = box/2
         for x_block in blocks:
             plt.axvline(x_block,ymin=y_min,ymax=y_max,color='r',linestyle='--')
 
