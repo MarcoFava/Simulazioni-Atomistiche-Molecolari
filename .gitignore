@@ -19,7 +19,8 @@ mc-lj/awa/
 mc-GC/save_past/
 
 project_colloids_polymers/hard_spheres_fortran/
-project_colloids_polymers/trajectories/
+project_colloids_polymers/.trajectories/
+project_colloids_polymers/save_memmap/
 
 */.pantarei/*
 */.f2py-jit/*

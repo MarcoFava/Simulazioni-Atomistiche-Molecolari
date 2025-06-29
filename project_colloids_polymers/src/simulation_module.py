@@ -69,7 +69,8 @@ def simulation(steps, burnin=0,**kwars):
     from src.interaction    import Interaction
     from src.system         import System
     from src.MonteCarlo     import MonteCarlo
-    from src.trajectory     import Trajectory
+    # from src.trajectory     import Trajectory
+    from src.traj_memmap    import Trajectory_Memmap
 
 
     parameters                = initial_parameters(**kwars)
@@ -79,6 +80,7 @@ def simulation(steps, burnin=0,**kwars):
     potential                 = parameters['potential']
     seed                      = parameters['seed']
     clear_first               = kwars.get('clear_first',True)
+
     # which_vals = kwars.get('which_vals', {'energy': False, 'pressure': False, 'density': False, 'N': False})
     
     # Create classes 
@@ -86,10 +88,14 @@ def simulation(steps, burnin=0,**kwars):
     interact      = Interaction(parameters_interaction, potential=potential)
     my_sys        = System(interact, parameters_system, config=configuration)
     montecarlo    = MonteCarlo(my_sys, interact, seed=seed)
-    trajectory    = Trajectory(sim_params=parameters,mode='w',clear_first=clear_first)
+    # trajectory    = Trajectory(sim_params=parameters,mode='w',clear_first=clear_first)
+
+    shape_pos = my_sys.positions.shape
+    shape_memmap  = (int(steps/100),shape_pos[0],[1])
+    trajectory    = Trajectory_Memmap(sim_params=parameters,mode='w',shape=shape_memmap,clear_first=clear_first)
 
     trajectory_dir = trajectory.trajectory_dir
-    print(f'seed: {seed}, trajectory_dir:\'{trajectory_dir}\'\n')
+    print(f'trajectory_dir=\'{trajectory_dir}\'   # seed: {seed}, shape: {trajectory.shape}\n')
 
     # Double check that there are no overlaps before starting the simulation
     if interact.check_overlap_all(my_sys.positions,my_sys.box): 
@@ -98,8 +104,6 @@ def simulation(steps, burnin=0,**kwars):
 
     #########################################################
     perc_prog = int(steps/20) # Print output every 5% of the total simulation
-    # save_pos = []
-    # dr_coll = []
 
     # keep track of the time spent in the simulation
     tot_time = 0
@@ -111,8 +115,10 @@ def simulation(steps, burnin=0,**kwars):
         # Every 100 steps, keep track of the positions in the trajectory
         if i % 100 == 0 and i >= burnin:
             trajectory.write(my_sys.positions,i)
-            # save_pos.append(my_sys.positions.copy())
-            # dr_coll.append(np.linalg.norm(my_sys.positions[0] - my_sys.positions[1]))
+        
+        # Every 1e4 steps flush the data into memory to read it from outside
+        if i % int(1e4) == 0 and i>= burnin:
+            trajectory.flush()
 
         # Every 5% of the total run, print some progress
         if i % perc_prog == 0: 
@@ -132,30 +138,24 @@ def simulation(steps, burnin=0,**kwars):
         #   f'packing frac: coll={my_sys.packing_fract_coll:.3}, part={my_sys.packing_fract_part:.3}'
           )
     
+    # Close the trajectory class
+    trajectory.__exit__()
 
     # Read again the positons to be returned
-    save_pos = []
-    for pos in trajectory:
-        save_pos.append(pos)
+    # save_pos = []
+    # with Trajectory_Memmap(sim_params=parameters,mode='r',shape=shape_memmap) as traj:
+    #     for pos in traj:
+    #         save_pos.append(pos)
 
 
     return {
             'accept_ratio': montecarlo.accept_ratio,'accept_ratio_coll': montecarlo.accept_ratio_coll, 'box': my_sys.box
             ,'tot_time': tot_time, 'effective time':tot_time/steps/my_sys.current_N
-            ,'trajectory': save_pos
+            # ,'trajectory': save_pos
             ,'packing_fract_coll':my_sys.packing_fract_coll,'packing_fract_part':my_sys.packing_fract_part
             ,'initial parameters' : parameters
             ,'trajectory_dir' : trajectory_dir
             }
-
-
-# def compute_gdr(positions,box,dr,n_bins):
-#     rmax = dr*n_bins
-#     hbox = box/2
-#     hist = 0
-
-#     for i in range(size)
-
 
 
 # def gdr(positions,box,n_bins,last_N):
@@ -170,6 +170,25 @@ def simulation(steps, burnin=0,**kwars):
 #                     print(int(r/dr),r/dr,r//dr)
 #                     counts[int(r/dr)] += 1
 #     return counts/counts.sum()
+
+def AO_potential(r,r_coll,r_part,density):
+    D = 2*(r_coll+r_part)
+    return - density * np.pi/6 * D**3 * (1 - 3*r/2/D + r**3/2/D**3)
+
+def full_potential(r,r_coll,r_part,N,V):
+    D = 2*(r_coll+r_part)
+    const = np.pi/6 * D**3/V
+    pot = -N*np.log( (1-const*( 1 + 1.5*r/D - 0.5*(r/D)**3 )) / (1-2*const) )
+    return pot
+
+def effective_potential(r,r_coll,r_part,N,V,which_pot='full'):
+    D = 2*(r_coll+r_part)
+    density = N/V
+    if which_pot == 'AO': pot = AO_potential(r,r_coll,r_part,density)
+    if which_pot == 'full': pot = full_potential(r,r_coll,r_part,N,V)
+    if r >= D: return 0
+    elif r >= 2*r_coll: return pot
+    elif r < 2*r_coll: return 500
 
 
 def plot_val_over_NMC(val,title=None, label=None,figname=None, x_multipl=1, ylabel=None,blocks=None,box=None):

@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 
 class Trajectory:
-    def __init__(self, sim_params: dict=None, directory='trajectories', mode='r', clear_first=False, trajectory_dir=None):
+    def __init__(self, sim_params: dict=None, directory='.trajectories', mode='r', clear_first=False, trajectory_dir=None):
         self.sim_params = sim_params
         self.directory = Path(directory)
         self.mode = mode
