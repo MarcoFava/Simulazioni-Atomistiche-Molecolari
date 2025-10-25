@@ -136,8 +136,8 @@ class System:
             # positions[:,0:n_coll] = (np.random.random((box.shape[0],n_coll))-0.5)*box[0]
             # positions[:,0:n_coll] = np.array([[0,0],[0,0],[0,2*self.r_coll]])
             # distance between colloids set to 2*(1 + 0.1*q)*r_coll 
-            # k = 2/np.sqrt(3)*(self.r_coll+0.1*self.r_part)
-            k = 2/np.sqrt(3)*(self.r_coll+1.5*self.r_part)
+            k = 2/np.sqrt(3)*(self.r_coll+0.1*self.r_part)
+            # k = 2/np.sqrt(3)*(self.r_coll+self.r_part)
             positions[:,0:n_coll] = np.array([[0,0,0],[k,k,k]]).T + np.ones((3,2))*(-box[0]/2+self.r_coll)
             
             if not self.interaction.check_overlap(positions,box,n_coll): break

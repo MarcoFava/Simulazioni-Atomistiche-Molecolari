@@ -22,26 +22,6 @@ class Trajectory_Memmap(_Trajectory):
         self._trajectory_file = self.trajectory_dir / "trajectory.dat"
         self._metadata_file = self.trajectory_dir / "metadata.json"
 
-        # if self.mode == 'w':
-        #     if shape is None:
-        #         raise ValueError("Shape must be provided in write mode.")
-        #     if clear_first: 
-        #         self.steps = []
-        #         self.mode_memmap = 'w+'
-        #         self._mmap = np.memmap(self._trajectory_file, dtype=self.dtype, 
-        #                                mode=self.mode_memmap, shape=self.shape, order='F')
-        #         self._save_metadata()
-        #     else: 
-        #         self._load_metadata()
-        #         self.mode_memmap = 'r+'
-        #         self._mmap = np.memmap(self._trajectory_file, dtype=self.dtype, 
-        #                                mode=self.mode_memmap, shape=self.shape, order='F')
-        # elif self.mode == 'r':
-        #     self.mode_memmap = 'r'
-        #     self._init_reader()
-        # else:
-        #     raise ValueError("Mode must be 'r' or 'w'.")
-
         # Clear folder only if file exists and clear_first=True in writing mode,
         # otherwise open in writing and reading mode
         if mode == 'w':
